@@ -2,9 +2,9 @@
 
 Projeto de pesquisa em R para análise empírica de Ações Diretas de
 Inconstitucionalidade (ADIs) de matéria eleitoral julgadas pelo Supremo Tribunal
-Federal entre 2016 e 2026. O objetivo é descrever padrões decisórios — taxas de
+Federal entre 2016 e 2026. O objetivo é descrever padrões decisórios, taxas de
 procedência, tempos de tramitação, relatorias, partes legitimadas, dispositivos
-impugnados e desfechos — a partir de dados extraídos do portal do STF.
+impugnados e desfechos a partir de dados extraídos do portal do STF.
 
 ---
 
@@ -79,11 +79,8 @@ projeto/
 
 ## Fonte dos dados
 
-Os dados primários foram extraídos do **Portal do Supremo Tribunal Federal**
-(<https://portal.stf.jus.br>), via consulta pública de jurisprudência e
-acompanhamento processual. A base bruta consolidada (`adis_final.xlsx`) reúne
-as ADIs de matéria eleitoral autuadas e/ou julgadas no período de
-**janeiro/2016 a [data de corte a definir]/2026**.
+Os dados primários foram extraídos do **Portal Corte Aberta, do Supremo Tribunal Federal**
+(<https://portal.stf.jus.br/hotsites/corteaberta/>), via consulta pública de jurisprudência e acompanhamento processual. A base bruta consolidada (`adis_final.xlsx`) reúne as ADIs de matéria eleitoral autuadas e/ou julgadas no período de **janeiro/2016 a [data de corte a definir]/2026**.
 
 A documentação detalhada das variáveis está em
 [`docs/codebook.md`](docs/codebook.md).
@@ -92,8 +89,7 @@ A documentação detalhada das variáveis está em
 
 ## Autoria
 
-**Davi Barbosa**
-Trabalho de Conclusão de Curso (TCC)
+**Davi Barbosa Costa**
 Contato: barbosadavi05@gmail.com
 
 ---
