@@ -80,7 +80,7 @@ projeto/
 ## Fonte dos dados
 
 Os dados primários foram extraídos do **Portal Corte Aberta, do Supremo Tribunal Federal**
-(<https://portal.stf.jus.br/hotsites/corteaberta/>), via consulta pública de jurisprudência e acompanhamento processual. A base bruta consolidada (`adis_final.xlsx`) reúne as ADIs de matéria eleitoral autuadas e/ou julgadas no período de **janeiro/2016 a [data de corte a definir]/2026**.
+(<https://portal.stf.jus.br/hotsites/corteaberta/>), via consulta pública de jurisprudência e acompanhamento processual. A base bruta consolidada (`adis_final.xlsx`) reúne as ADIs de matéria eleitoral autuadas e/ou julgadas no período de **2016 a 2026**.
 
 A documentação detalhada das variáveis está em
 [`docs/codebook.md`](docs/codebook.md).
