@@ -1,0 +1,377 @@
+---
+title: "Análise exploratória — ADIs eleitorais no STF (2016-2026)"
+author: "Davi Barbosa"      # ← preencher / confirmar
+date: today
+date-format: "DD [de] MMMM [de] YYYY"
+lang: pt-BR
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-title: "Sumário"
+    number-sections: true
+    number-depth: 2
+    code-fold: false
+    code-tools: true
+    theme: cosmo
+    fig-align: center
+    fig-width: 7
+    fig-height: 4.5
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Ancora o projeto a partir do qmd para que here::here() funcione tanto
+# durante a renderização do Quarto (cwd = pasta do .qmd) quanto em execução
+# interativa de chunks no RStudio.
+here::i_am("notebooks/exploracao.qmd")
+
+# 00_setup.R: pacotes (tidyverse, gt, scales etc.) + opções pt-BR.
+# tema_grafico.R: tema_pesquisa() e paletas reutilizadas em chunks que
+# eventualmente regerem ggplots inline.
+source(here::here("R", "00_setup.R"))
+source(here::here("R", "utils", "tema_grafico.R"))
+```
+
+# Apresentação dos dados
+
+O corpus reúne **28 Ações Diretas de Inconstitucionalidade (ADIs)** ajuizadas
+perante o **Supremo Tribunal Federal** em matéria **eleitoral**, autuadas
+entre 2016 e 2026. A base bruta foi extraída do portal de jurisprudência do
+STF (`jurisprudencia.stf.jus.br`) e armazenada em
+`data/raw/adis_final.xlsx`. Cada linha corresponde a uma ADI única — a
+deduplicação foi feita manualmente.
+
+**Critério de inclusão.** Foram retidas apenas ADIs cujo objeto envolvesse
+norma de direito eleitoral (Lei 9.504/1997, Código Eleitoral, resoluções do
+TSE com força normativa, EC eleitoral etc.) e que já contassem com decisão
+final no portal — sejam decisões de mérito (procedência total ou parcial,
+improcedência) ou decisões terminativas (não conhecimento, negativa de
+seguimento, prejudicialidade).
+
+**Recorte temporal.** A janela 2016-2026 cobre cinco pleitos consecutivos
+(três municipais e dois gerais) e o pleito geral em curso, permitindo
+analisar o comportamento decisório do STF ao longo de quatro mandatos
+presidenciais distintos.
+
+**Variáveis principais** (após categorização em `01_carregamento_categorizacao.R`):
+
+-   `categoria_analise`: Mérito · Sem mérito · Prejudicado.
+-   `modo_decisao`: Colegiada · Monocrática.
+-   `ambiente_simplificado`: Plenário Virtual · Plenário Presencial ·
+    Monocrática/Outro.
+-   `anos_tramitacao`: tempo entre autuação e decisão final, em anos.
+
+```{r}
+#| label: carregar-dados
+
+adis <- readRDS(here::here("data", "interim", "adis_categorizadas.rds"))
+```
+
+# Panorama geral
+
+```{r}
+#| label: dimensoes
+
+dim(adis)
+```
+
+Vinte e oito ADIs × 27 variáveis. As colunas de interesse analítico
+imediato:
+
+```{r}
+#| label: summary-colunas-chave
+
+summary(adis[, c(
+  "anos_tramitacao",
+  "categoria_analise",
+  "modo_decisao",
+  "ambiente_simplificado",
+  "ano_decisao"
+)])
+```
+
+A tabela de panorama agregado, produzida por `02_descritivas.R`:
+
+```{r}
+#| label: tab-panorama
+
+panorama <- readr::read_csv(
+  here::here("output", "tabelas", "panorama_geral.csv"),
+  show_col_types = FALSE
+)
+
+panorama |>
+  gt::gt() |>
+  gt::tab_header(
+    title    = "Panorama geral do corpus",
+    subtitle = "ADIs eleitorais — STF, 2016-2026"
+  ) |>
+  gt::cols_label(indicador = "Indicador", valor = "Valor") |>
+  gt::tab_source_note("Fonte: elaboração própria.")
+```
+
+# Quem decide
+
+A relatoria é o primeiro filtro institucional: o ministro relator escolhe se
+e quando o caso entra em pauta, e qual o rito (monocrático vs. submissão ao
+colegiado). Concentração de relatorias é um indicador parcial de captura
+temática.
+
+```{r}
+#| label: tab-relatores
+
+adis |>
+  dplyr::filter(!is.na(relator_atual)) |>
+  dplyr::count(Relator = relator_atual, name = "Total") |>
+  dplyr::arrange(dplyr::desc(Total), Relator) |>
+  gt::gt() |>
+  gt::tab_header(title = "ADIs por ministro relator") |>
+  gt::cols_align("left",  columns = Relator) |>
+  gt::cols_align("right", columns = Total)
+```
+
+A figura 5 detalha o desfecho de cada relatoria:
+
+```{r}
+#| label: fig-relatores
+#| fig-cap: "Volume de ADIs por relator e desfecho processual."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig05_relatores.png")
+)
+```
+
+**Observação substantiva.** Quatro ministros (Toffoli, Barroso, Lewandowski
+e Luiz Fux) concentram **14 das 28 ADIs (50%)** do corpus. Esse núcleo
+combina trajetórias institucionais distintas (TSE/PGR/STF) e perfis
+decisórios também distintos — Toffoli e Lewandowski apresentam **100% de
+mérito**, enquanto Barroso e Celso de Mello concentram a maior parte das
+decisões sem mérito.
+
+# Como decide
+
+A clivagem entre **colegiada** (Plenário ou Turma) e **monocrática** (decisão
+solo do relator) é estruturante: define quem é o autor institucional do
+provimento e qual o tipo de visibilidade pública que ele recebe.
+
+```{r}
+#| label: tab-modo-cat
+
+readr::read_csv(
+  here::here("output", "tabelas", "cruzamento_modo_categoria.csv"),
+  show_col_types = FALSE
+) |>
+  gt::gt() |>
+  gt::tab_header(
+    title    = "Modo de decisão × categoria analítica",
+    subtitle = "N (% por linha)"
+  )
+```
+
+```{r}
+#| label: fig-modo-categoria
+#| fig-cap: "Modo de decisão e desfecho processual (barras agrupadas)."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig03_modo_categoria.png")
+)
+```
+
+::: {.callout-important title="Achado central"}
+**100% das decisões de mérito (20/20) são colegiadas**, ao passo que **7 das
+8 não-decisões (87,5%) — soma de "Sem mérito" e "Prejudicado" — são
+monocráticas**. Em outras palavras: o filtro de admissibilidade do STF em
+matéria eleitoral opera quase exclusivamente *intra muros do gabinete do
+relator*, sem deliberação colegiada. Já o enfrentamento substantivo da
+inconstitucionalidade alegada é integralmente delegado ao Plenário.
+:::
+
+# O que decide
+
+Distribuição agregada dos resultados:
+
+```{r}
+#| label: fig-distribuicao
+#| fig-cap: "Frequência de cada rótulo bruto de andamento da decisão final (n=28)."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig01_distribuicao_andamentos.png")
+)
+```
+
+```{r}
+#| label: fig-ano-categoria
+#| fig-cap: "Decisões finais por ano de decisão, empilhadas pela categoria analítica."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig02_decisoes_por_ano.png")
+)
+```
+
+A composição revela três padrões empíricos:
+
+1.  **"Procedente em parte" lidera** (9 ADIs, 32,1%) — predominância de uma
+    estratégia de interpretação conforme e *judicial minimalism* sobre
+    decretação plena de inconstitucionalidade.
+2.  **Improcedência supera procedência total** (8 × 3) — o STF tende a
+    confirmar a legislação eleitoral mais do que invalidá-la integralmente.
+3.  **Picos temporais** em **2018** (6 ADIs) e **2022** (6 ADIs) coincidem
+    com anos de **eleição geral**, sugerindo *timing* decisório associado ao
+    calendário eleitoral — hipótese explorada na seção 6.
+
+# Quando decide
+
+Três cortes temporais complementares.
+
+**(a) Distribuição do tempo de tramitação por categoria:**
+
+```{r}
+#| label: fig-tempo-boxplot
+#| fig-cap: "Tempo de tramitação (anos) entre autuação e decisão, por categoria. Losango = média; linha central = mediana."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig04_tempo_tramitacao_boxplot.png")
+)
+```
+
+A mediana global é de **1,22 anos** e a média, de **1,81 anos** — diferença
+indicativa de assimetria à direita, puxada por casos extremos
+(máx. = 7,42 anos, ADI 5875).
+
+**(b) Linha do tempo de cada ADI:**
+
+```{r}
+#| label: fig-linha-tempo
+#| fig-cap: "Linha do tempo individual de cada ADI: círculo vazado = autuação, ponto cheio = decisão."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig07_linha_tempo_adis.png")
+)
+```
+
+**(c) Tramitação cruzada com o calendário eleitoral:**
+
+```{r}
+#| label: fig-calendario
+#| fig-cap: "Tramitação das ADIs sobreposta às datas das eleições do período. Linha grossa = ADI cuja tramitação cruzou pelo menos um pleito."
+
+knitr::include_graphics(
+  here::here("output", "figuras", "fig09_tramitacao_e_eleicoes.png")
+)
+```
+
+Sobreposição empírica entre os universos judicial e eleitoral
+(produzida por `04_analise_temporal.R`):
+
+```{r}
+#| label: tab-calendario
+
+tempo_calendario <- readr::read_csv(
+  here::here("output", "tabelas", "tempo_calendario_eleitoral.csv"),
+  show_col_types = FALSE
+)
+
+tempo_calendario |>
+  dplyr::summarise(
+    `ADIs com >= 1 eleição na tramitação` =
+      sum(n_eleicoes_durante_tramitacao >= 1L, na.rm = TRUE),
+    `ADIs decididas com >= 1 ano de antecedência (art. 16 CF)` =
+      sum(decidida_antes_da_eleicao_relevante, na.rm = TRUE),
+    `Mediana de dias até a próxima eleição` =
+      stats::median(dias_ate_proxima_eleicao_apos_decisao, na.rm = TRUE)
+  ) |>
+  tidyr::pivot_longer(
+    dplyr::everything(),
+    names_to  = "Indicador",
+    values_to = "Valor"
+  ) |>
+  gt::gt() |>
+  gt::tab_header(title = "Acoplamento entre tramitação e calendário eleitoral")
+```
+
+# Síntese
+
+Cinco achados principais, cada um amarrado a um conceito da literatura sobre
+judicialização e governança eleitoral:
+
+-   **(i) Monocratização das não-decisões.** **100% das decisões de mérito**
+    são colegiadas e **87,5% das não-decisões** (sem mérito + prejudicado)
+    são monocráticas. Conecta-se ao conceito de **monocratização do STF**
+    (Arguelhes & Ribeiro): o filtro de admissibilidade é decidido solo, e
+    apenas o enfrentamento substantivo do mérito chega ao colegiado. O
+    custo institucional dessa divisão é a opacidade do gatekeeping
+    individual.
+
+-   **(ii) Concentração relatorial e poder de pauta.** Quatro ministros
+    (Toffoli, Barroso, Lewandowski e Luiz Fux) concentram **50% do
+    corpus** — assimetria expressiva em um Tribunal de 11 cadeiras.
+    Conecta-se ao conceito de **controle de agenda judicial individual**: o
+    relator detém poder de pauta sobre o caso desde a distribuição até a
+    liberação para julgamento, e essa concentração é um proxy parcial de
+    captura temática (especialização ou cumulação?).
+
+-   **(iii) Anterioridade comprometida.** Apenas **6 das 28 ADIs (21,4%)**
+    foram decididas com pelo menos um ano de antecedência da próxima
+    eleição — limiar do **art. 16 da CF**. As demais, mesmo quando
+    procedentes, tendem a produzir efeitos vinculantes apenas no pleito
+    seguinte. Conecta-se ao conceito de **anterioridade eleitoral / segurança
+    jurídica do regime eleitoral**: o STF decide, mas a *time horizon* da
+    decisão é deslocada.
+
+-   **(iv) Acoplamento temporal com o ciclo eleitoral.** **15 das 28 ADIs
+    (53,6%)** tiveram pelo menos uma eleição passando durante sua
+    tramitação. Picos decisórios em **2018** e **2022** coincidem com anos
+    de eleição geral. Conecta-se ao conceito de **governança eleitoral
+    judicializada**: o Tribunal opera não em isolamento do calendário, mas
+    em compasso (sincronizado ou contracíclico — questão em aberto) com
+    ele.
+
+-   **(v) Tempo modesto com cauda longa.** Mediana de tramitação de 1,22
+    anos é compatível com a expectativa de celeridade em matéria eleitoral,
+    mas o máximo de 7,42 anos (ADI 5875) e a assimetria à direita revelam
+    que **uma minoria de casos fica represada**. Conecta-se ao conceito de
+    **controle de agenda judicial**: a celeridade média não impede o uso
+    estratégico da "gaveta" para casos politicamente sensíveis.
+
+# Reprodutibilidade
+
+Para reproduzir este notebook a partir de uma cópia limpa do repositório:
+
+```bash
+# 1. Restaurar o ambiente de pacotes a partir do lockfile do renv.
+Rscript -e 'renv::restore()'
+
+# 2. Rodar o pipeline na ordem.
+Rscript R/01_carregamento_categorizacao.R
+Rscript R/02_descritivas.R
+Rscript R/03_visualizacoes.R
+Rscript R/04_analise_temporal.R
+
+# 3. Renderizar este documento.
+quarto render notebooks/exploracao.qmd
+```
+
+Estado atual do ambiente:
+
+```{r}
+#| label: renv-status
+
+renv::status()
+```
+
+Sessão (R + pacotes carregados):
+
+```{r}
+#| label: sessioninfo
+
+sessionInfo()
+```

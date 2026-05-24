@@ -1,0 +1,106 @@
+# =============================================================================
+# .gitignore — Projeto de análise empírica de ADIs eleitorais (STF, 2016-2026)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Sessão e histórico do R
+# -----------------------------------------------------------------------------
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Ruserdata
+
+# -----------------------------------------------------------------------------
+# Arquivos do RStudio
+# -----------------------------------------------------------------------------
+.Rproj.user/
+*.Rproj.user
+
+# Mantém o .Rproj versionado (útil para colaboradores), mas se preferir
+# ignorá-lo, descomente a linha abaixo:
+# *.Rproj
+
+# -----------------------------------------------------------------------------
+# renv — versionamos apenas o lockfile e os scripts de ativação
+# -----------------------------------------------------------------------------
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+# Mantemos: renv/activate.R, renv/settings.json, renv.lock
+
+# -----------------------------------------------------------------------------
+# Saídas de renderização (Quarto, R Markdown, LaTeX)
+# -----------------------------------------------------------------------------
+# Documentos gerados são regeneráveis a partir das fontes (.qmd/.Rmd/.tex).
+# Os .html das tabelas em output/tabelas/ entram como exceção mais abaixo.
+*.html
+*.pdf
+
+# -----------------------------------------------------------------------------
+# Figuras (output/figuras/) — versionamos os PNG, ignoramos os SVG
+# -----------------------------------------------------------------------------
+# Os PNG (300 dpi) ficam no repositório para inserção direta no artigo.
+# Os SVG são pesados e podem ser regenerados a qualquer momento via
+# `Rscript R/03_visualizacoes.R`.
+# >>> DECISÃO DO AUTOR — para também versionar SVGs, comente a linha abaixo.
+output/figuras/*.svg
+
+# -----------------------------------------------------------------------------
+# Tabelas (output/tabelas/) — versionamos CSV, MD e HTML
+# -----------------------------------------------------------------------------
+# Saídas auditáveis do pipeline descritivo. A linha de exceção abaixo
+# permite que os .html das tabelas escapem do bloco *.html acima.
+!output/tabelas/*.html
+
+# -----------------------------------------------------------------------------
+# Dados intermediários e processados — VERSIONADOS
+# -----------------------------------------------------------------------------
+# Decisão do autor: data/interim/ e data/processed/ entram no repositório
+# como saídas auditáveis do pipeline (a banca/colaboradores podem inspecionar
+# o estado intermediário sem precisar rodar os scripts). Tamanho é pequeno
+# (~kB cada). Para voltar a ignorá-los, descomente as linhas abaixo.
+# data/interim/*
+# data/processed/*
+# !data/interim/.gitkeep
+# !data/processed/.gitkeep
+
+# -----------------------------------------------------------------------------
+# Arquivos do sistema operacional
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# -----------------------------------------------------------------------------
+# Editores e IDEs
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------------------------------------
+# Claude Code — configurações locais (não compartilhar)
+# -----------------------------------------------------------------------------
+# settings.local.json guarda permissões aprovadas na máquina do autor.
+# Mantemos .claude/settings.json versionado (se existir), pois reflete
+# configuração compartilhada do projeto.
+.claude/settings.local.json
+
+# -----------------------------------------------------------------------------
+# Artefatos diversos
+# -----------------------------------------------------------------------------
+*.log
+*.tmp
+*.bak
+*_cache/
+*_files/
+*.utf8.md
+*.knit.md

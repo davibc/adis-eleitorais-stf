@@ -1,0 +1,29 @@
+processo,andamento_decisao,n_eleicoes_durante_tramitacao,dias_ate_proxima_eleicao_apos_decisao,decidida_antes_da_eleicao_relevante
+ADI 5487,Procedente em parte,0,38,FALSE
+ADI 5488,Procedente em parte,0,31,FALSE
+ADI 5491,Improcedente,0,38,FALSE
+ADI 5507,Procedente em parte,3,27,FALSE
+ADI 5518,Não conhecido(s),2,199,FALSE
+ADI 5525,Procedente em parte,1,213,FALSE
+ADI 5577,Improcedente,0,38,FALSE
+ADI 5617,Procedente,0,206,FALSE
+ADI 5619,Improcedente,0,213,FALSE
+ADI 5730,Não conhecido(s),1,200,FALSE
+ADI 5759,Negado seguimento,0,33,FALSE
+ADI 5808,Prejudicado,1,713,TRUE
+ADI 5875,Procedente em parte,4,494,TRUE
+ADI 5889,Procedente,1,60,FALSE
+ADI 5922,Não conhecido(s),0,16,FALSE
+ADI 6032,Procedente em parte,0,346,FALSE
+ADI 6044,Improcedente,1,573,TRUE
+ADI 6230,Procedente em parte,1,55,FALSE
+ADI 6281,Improcedente,1,227,FALSE
+ADI 6356,Negado seguimento,0,149,FALSE
+ADI 6395,Improcedente,0,76,FALSE
+ADI 6630,Não conhecido(s),0,207,FALSE
+ADI 6703,Procedente,1,536,TRUE
+ADI 7178,Procedente em parte,1,659,TRUE
+ADI 7214,Improcedente,1,734,TRUE
+ADI 7244,Não conhecido(s),2,143,FALSE
+ADI 7325,Procedente em parte,0,221,FALSE
+ADI 7677,Improcedente,1,501,TRUE
