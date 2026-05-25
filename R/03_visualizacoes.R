@@ -50,8 +50,8 @@ adis <- readRDS(here::here("data", "interim", "adis_categorizadas.rds"))
 # 2. Configurações globais das figuras
 # -----------------------------------------------------------------------------
 caption_fonte <- paste0(
-  "Fonte: elaboração própria com base em dados do STF ",
-  "(jurisprudencia.stf.jus.br)."
+  "Fonte: elaboração própria com base nos dados do STF ",
+  "(https://portal.stf.jus.br/hotsites/corteaberta/)."
 )
 
 # Dimensões padrão (cm) — sobrescrevíveis por figura.

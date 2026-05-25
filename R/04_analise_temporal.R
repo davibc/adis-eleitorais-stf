@@ -184,8 +184,8 @@ cat(sprintf(
 # nas datas das eleições do período. ADIs cuja tramitação cruza pelo menos
 # uma eleição são desenhadas com traço mais grosso.
 caption_fonte <- paste0(
-  "Fonte: elaboração própria com base em dados do STF ",
-  "(jurisprudencia.stf.jus.br)."
+  "Fonte: elaboração própria com base nos dados do STF ",
+  "(https://portal.stf.jus.br/hotsites/corteaberta/)."
 )
 
 df_fig09 <- adis_enriquecidas |>
@@ -261,8 +261,17 @@ fig09 <- ggplot2::ggplot(
     panel.grid.major.y = ggplot2::element_line(colour = "#F5F5F5", linewidth = 0.3),
     panel.grid.major.x = ggplot2::element_blank(),
     axis.text.y        = ggplot2::element_text(size = 7),
+    # Margem inferior do subtítulo ampliada para abrir espaço entre o texto
+    # e os rótulos das eleições ("municipal/2016", etc.) que ficam ancorados
+    # no topo do painel.
+    plot.subtitle      = ggplot2::element_text(
+      size   = 10,
+      hjust  = 0.5,
+      colour = "#555555",
+      margin = ggplot2::margin(b = 24)
+    ),
     # Margem superior ampliada para acomodar os rótulos das eleições.
-    plot.margin        = ggplot2::margin(t = 28, r = 14, b = 10, l = 10)
+    plot.margin        = ggplot2::margin(t = 36, r = 14, b = 10, l = 10)
   )
 
 print(fig09)

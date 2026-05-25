@@ -46,7 +46,7 @@ source(here::here("R", "utils", "tema_grafico.R"))
 O corpus reúne **28 Ações Diretas de Inconstitucionalidade (ADIs)** ajuizadas
 perante o **Supremo Tribunal Federal** em matéria **eleitoral**, autuadas
 entre 2016 e 2026. A base bruta foi extraída do portal de jurisprudência do
-STF (`jurisprudencia.stf.jus.br`) e armazenada em
+STF (<https://portal.stf.jus.br/hotsites/corteaberta/>) e armazenada em
 `data/raw/adis_final.xlsx`. Cada linha corresponde a uma ADI única — a
 deduplicação foi feita manualmente.
 
